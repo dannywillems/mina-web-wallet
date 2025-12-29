@@ -1,0 +1,31 @@
+[package]
+name = "mina-web-wallet-wasm"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "WebAssembly module for Mina web wallet"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+mina-web-wallet-core = { path = "../core" }
+mina-signer.workspace = true
+mina-curves.workspace = true
+o1-utils.workspace = true
+
+wasm-bindgen.workspace = true
+serde-wasm-bindgen.workspace = true
+js-sys.workspace = true
+web-sys.workspace = true
+console_error_panic_hook.workspace = true
+
+serde.workspace = true
+serde_json.workspace = true
+hex.workspace = true
+
+# Enable js feature for getrandom (needed for WASM random number generation)
+getrandom = { version = "0.2", features = ["js"] }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"

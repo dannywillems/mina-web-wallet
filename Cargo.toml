@@ -1,0 +1,45 @@
+[workspace]
+resolver = "2"
+members = ["core", "wasm-module", "cli"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+
+[workspace.dependencies]
+# o1-labs/proof-systems crates
+mina-signer = { git = "https://github.com/o1-labs/proof-systems", branch = "master" }
+mina-curves = { git = "https://github.com/o1-labs/proof-systems", branch = "master" }
+mina-hasher = { git = "https://github.com/o1-labs/proof-systems", branch = "master" }
+o1-utils = { git = "https://github.com/o1-labs/proof-systems", branch = "master" }
+
+# Elliptic curve arithmetic (same foundation as o1-labs/proof-systems)
+ark-ff = { version = "0.5", default-features = false }
+ark-ec = { version = "0.5", default-features = false }
+ark-serialize = { version = "0.5", default-features = false }
+
+# Serialization
+hex = "0.4"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Crypto utilities
+bs58 = "0.5"
+sha2 = "0.10"
+blake2 = "0.10"
+rand = "0.8"
+
+# CLI
+clap = { version = "4.5", features = ["derive"] }
+
+# Error handling
+thiserror = "2.0"
+
+# WASM
+wasm-bindgen = "0.2"
+serde-wasm-bindgen = "0.6"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = ["console"] }
+getrandom = { version = "0.3", features = ["wasm_js"] }
+console_error_panic_hook = "0.1"

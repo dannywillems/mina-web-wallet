@@ -1,0 +1,12 @@
+# Build artifacts
+target/
+frontend/pkg/
+node_modules/
+
+# Generated files
+*.wasm
+Cargo.lock
+package-lock.json
+
+# Git
+.git/

@@ -1,0 +1,31 @@
+# Rust
+/target/
+**/target/
+Cargo.lock
+
+# WASM
+wasm-module/pkg/
+
+# Node
+node_modules/
+package-lock.json
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.wasm
+*.js.map
+
+# Frontend generated
+frontend/css/
+
+# Logs
+*.log

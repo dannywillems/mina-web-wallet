@@ -1,0 +1,128 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # Rust WASM Build and Test
+  rust-wasm:
+    name: Rust WASM
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          targets: wasm32-unknown-unknown
+          components: rustfmt, clippy
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+
+      - name: Run clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Run tests
+        run: cargo test --all
+
+      - name: Install wasm-pack
+        run: make install-wasm-pack
+
+      - name: Build WASM module
+        run: make build-wasm
+
+      - name: Upload WASM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wasm-pkg
+          path: frontend/pkg/
+
+  # CLI Build and Test
+  cli:
+    name: CLI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust nightly
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache Cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-cli-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-cli-
+
+      - name: Check formatting
+        run: cargo fmt -p mina-wallet-cli -- --check
+
+      - name: Run clippy
+        run: cargo clippy -p mina-wallet-cli -- -D warnings
+
+      - name: Run tests
+        run: cargo test -p mina-wallet-cli
+
+      - name: Build CLI
+        run: make build-cli
+
+      - name: Test CLI
+        run: |
+          ./target/release/mina-wallet generate --format json
+          ./target/release/mina-wallet validate B62qiy32p8kAKnny8ZFwoMhYpBppM1DWVCqAPBYNcXnsAHhnfAAuXgg || true
+
+  # Frontend Validation
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate HTML
+        run: |
+          # Basic HTML validation
+          if grep -q "<!DOCTYPE html>" frontend/index.html; then
+            echo "HTML looks valid"
+          else
+            echo "Missing DOCTYPE"
+            exit 1
+          fi
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check frontend/app.js
+
+  # Build Complete Gate
+  build-complete:
+    name: Build Complete
+    runs-on: ubuntu-latest
+    needs: [rust-wasm, cli, frontend]
+    steps:
+      - name: All builds passed
+        run: echo "All CI checks passed!"

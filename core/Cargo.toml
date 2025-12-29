@@ -1,0 +1,31 @@
+[package]
+name = "mina-web-wallet-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Core library for Mina web wallet - key derivation, signing, and address encoding"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# o1-labs/proof-systems crates
+mina-signer.workspace = true
+mina-curves.workspace = true
+mina-hasher.workspace = true
+o1-utils.workspace = true
+
+# Arkworks (same as proof-systems)
+ark-ff.workspace = true
+ark-ec.workspace = true
+ark-serialize.workspace = true
+
+# Utilities
+hex.workspace = true
+bs58.workspace = true
+sha2.workspace = true
+blake2.workspace = true
+rand.workspace = true
+thiserror.workspace = true
+serde.workspace = true

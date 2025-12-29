@@ -1,0 +1,26 @@
+{
+  "name": "mina-web-wallet",
+  "version": "0.1.0",
+  "description": "A privacy-preserving Mina wallet that runs in your browser",
+  "private": true,
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "^3.2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dannywillems/mina-web-wallet"
+  },
+  "keywords": [
+    "mina",
+    "wallet",
+    "cryptocurrency",
+    "wasm",
+    "rust"
+  ],
+  "author": "Danny Willems",
+  "license": "MIT"
+}

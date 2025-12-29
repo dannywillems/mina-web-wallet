@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mina Web Wallet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <style>
+        :root {
+            --mina-purple: #6B4FBB;
+            --mina-purple-dark: #5A3DAA;
+            --mina-gradient: linear-gradient(135deg, #6B4FBB 0%, #E91E63 100%);
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .navbar {
+            background: rgba(0, 0, 0, 0.3) !important;
+            backdrop-filter: blur(10px);
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+        }
+
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--mina-gradient);
+            border: none;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(107, 79, 187, 0.3);
+            background: var(--mina-gradient);
+        }
+
+        .btn-outline-light {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-outline-light:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 8px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--mina-purple);
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(107, 79, 187, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .wallet-address {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            color: #e0e0e0;
+        }
+
+        .secret-key {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.75rem;
+            word-break: break-all;
+            background: rgba(220, 53, 69, 0.15);
+            border: 1px solid rgba(220, 53, 69, 0.4);
+            padding: 12px;
+            border-radius: 8px;
+            color: #f5a3ab;
+        }
+
+        /* Wallet result section */
+        .wallet-result {
+            color: #e0e0e0;
+        }
+
+        .wallet-result .form-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .copy-btn {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .copy-btn:hover {
+            opacity: 1;
+        }
+
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.15);
+            border-color: rgba(255, 193, 7, 0.4);
+            color: #ffe066;
+        }
+
+        .alert-success {
+            background: rgba(25, 135, 84, 0.15);
+            border-color: rgba(25, 135, 84, 0.4);
+            color: #75d9a3;
+        }
+
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.15);
+            border-color: rgba(220, 53, 69, 0.4);
+            color: #f5a3ab;
+        }
+
+        /* Override Bootstrap's text-muted for dark mode */
+        .text-muted {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+
+        /* Form labels */
+        .form-label {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Form helper text */
+        .form-text {
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+
+        /* Select dropdown options (for browsers that support it) */
+        .form-select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        .hero-section {
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--mina-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tab-content {
+            padding: 24px;
+        }
+
+        .nav-tabs {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-tabs .nav-link {
+            color: rgba(255, 255, 255, 0.7);
+            border: none;
+            padding: 12px 24px;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: #fff;
+            border: none;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: transparent;
+            color: #fff;
+            border: none;
+            border-bottom: 2px solid var(--mina-purple);
+        }
+
+        .loading {
+            display: none;
+        }
+
+        .loading.active {
+            display: inline-block;
+        }
+
+        footer {
+            margin-top: 60px;
+            padding: 20px 0;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <strong>Mina Web Wallet</strong>
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="nav-item nav-link text-muted" id="version-info">Loading...</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero-section">
+            <h1 class="hero-title">Mina Web Wallet</h1>
+            <p class="text-muted mt-3">
+                Generate and manage Mina wallets securely in your browser.<br>
+                All cryptographic operations happen locally - your keys never leave your device.
+            </p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="generate-tab" data-bs-toggle="tab" data-bs-target="#generate" type="button" role="tab">Generate Wallet</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="import-tab" data-bs-toggle="tab" data-bs-target="#import" type="button" role="tab">Import Wallet</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="validate-tab" data-bs-toggle="tab" data-bs-target="#validate" type="button" role="tab">Validate Address</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content">
+                            <!-- Generate Wallet Tab -->
+                            <div class="tab-pane fade show active" id="generate" role="tabpanel">
+                                <div class="mb-4">
+                                    <label for="generate-network" class="form-label">Network</label>
+                                    <select class="form-select" id="generate-network">
+                                        <option value="mainnet" selected>Mainnet</option>
+                                        <option value="testnet">Testnet</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary w-100" id="generate-btn">
+                                    <span class="loading spinner-border spinner-border-sm me-2" role="status"></span>
+                                    Generate New Wallet
+                                </button>
+                                <div id="generate-result" class="mt-4" style="display: none;"></div>
+                            </div>
+
+                            <!-- Import Wallet Tab -->
+                            <div class="tab-pane fade" id="import" role="tabpanel">
+                                <div class="mb-3">
+                                    <label for="import-secret" class="form-label">Secret Key</label>
+                                    <input type="password" class="form-control" id="import-secret" placeholder="Enter secret key (hex or base58 format)">
+                                    <div class="form-text text-muted">Supports hex (64 chars) or Base58 (52 chars) format</div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="import-network" class="form-label">Network</label>
+                                    <select class="form-select" id="import-network">
+                                        <option value="mainnet" selected>Mainnet</option>
+                                        <option value="testnet">Testnet</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary w-100" id="import-btn">
+                                    <span class="loading spinner-border spinner-border-sm me-2" role="status"></span>
+                                    Import Wallet
+                                </button>
+                                <div id="import-result" class="mt-4" style="display: none;"></div>
+                            </div>
+
+                            <!-- Validate Address Tab -->
+                            <div class="tab-pane fade" id="validate" role="tabpanel">
+                                <div class="mb-4">
+                                    <label for="validate-address" class="form-label">Mina Address</label>
+                                    <input type="text" class="form-control" id="validate-address" placeholder="B62q...">
+                                </div>
+                                <button class="btn btn-primary w-100" id="validate-btn">
+                                    <span class="loading spinner-border spinner-border-sm me-2" role="status"></span>
+                                    Validate Address
+                                </button>
+                                <div id="validate-result" class="mt-4" style="display: none;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning mt-4" role="alert">
+                    <strong>Security Notice:</strong> This wallet runs entirely in your browser. Your private keys are never sent to any server.
+                    However, always ensure you're using this tool on a secure, private device. Never share your secret keys with anyone.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>
+                Built with Rust and WebAssembly |
+                <a href="https://github.com/dannywillems/mina-web-wallet" target="_blank">Source Code</a> |
+                Commit: <code id="commit-hash">__COMMIT_SHORT__</code>
+            </p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>

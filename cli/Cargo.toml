@@ -1,0 +1,19 @@
+[package]
+name = "mina-wallet-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Command-line interface for Mina wallet operations"
+
+[[bin]]
+name = "mina-wallet"
+path = "src/main.rs"
+
+[dependencies]
+mina-web-wallet-core = { path = "../core" }
+mina-signer.workspace = true
+
+clap.workspace = true
+hex.workspace = true
+serde.workspace = true
+serde_json.workspace = true
