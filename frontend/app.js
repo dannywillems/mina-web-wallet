@@ -14,6 +14,61 @@ import init, {
     version
 } from './pkg/mina_web_wallet_wasm.js';
 
+// Theme management
+const THEME_KEY = 'mina-wallet-theme';
+
+function getSystemTheme() {
+    return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+
+function getSavedTheme() {
+    return localStorage.getItem(THEME_KEY);
+}
+
+function saveTheme(theme) {
+    localStorage.setItem(THEME_KEY, theme);
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    updateThemeToggleIcon(theme);
+}
+
+function updateThemeToggleIcon(theme) {
+    const sunIcon = document.getElementById('theme-icon-sun');
+    const moonIcon = document.getElementById('theme-icon-moon');
+    if (sunIcon && moonIcon) {
+        if (theme === 'light') {
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+        } else {
+            sunIcon.style.display = 'block';
+            moonIcon.style.display = 'none';
+        }
+    }
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(newTheme);
+    saveTheme(newTheme);
+}
+
+function initTheme() {
+    const savedTheme = getSavedTheme();
+    const theme = savedTheme || getSystemTheme();
+    applyTheme(theme);
+
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', (e) => {
+        // Only auto-switch if user hasn't set a preference
+        if (!getSavedTheme()) {
+            applyTheme(e.matches ? 'light' : 'dark');
+        }
+    });
+}
+
 // Initialize the WASM module
 let wasmLoaded = false;
 
@@ -77,11 +132,11 @@ async function copyToClipboard(text, buttonElement) {
         const originalText = buttonElement.textContent;
         buttonElement.textContent = 'Copied!';
         buttonElement.classList.add('btn-success');
-        buttonElement.classList.remove('btn-outline-light');
+        buttonElement.classList.remove('btn-outline-secondary');
         setTimeout(() => {
             buttonElement.textContent = originalText;
             buttonElement.classList.remove('btn-success');
-            buttonElement.classList.add('btn-outline-light');
+            buttonElement.classList.add('btn-outline-secondary');
         }, 2000);
     } catch (error) {
         console.error('Failed to copy:', error);
@@ -95,7 +150,7 @@ function renderWalletResult(elementId, walletData) {
                 <label class="form-label text-muted small">Address</label>
                 <div class="wallet-address d-flex justify-content-between align-items-start">
                     <span id="${elementId}-address">${escapeHtml(walletData.address)}</span>
-                    <button class="btn btn-sm btn-outline-light copy-btn ms-2" onclick="window.copyAddress('${elementId}-address', this)">Copy</button>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn ms-2" onclick="window.copyAddress('${elementId}-address', this)">Copy</button>
                 </div>
             </div>
 
@@ -103,7 +158,7 @@ function renderWalletResult(elementId, walletData) {
                 <label class="form-label text-muted small">Secret Key (Hex)</label>
                 <div class="secret-key d-flex justify-content-between align-items-start">
                     <span id="${elementId}-hex" class="secret-text" style="filter: blur(5px); cursor: pointer;" onclick="this.style.filter = this.style.filter ? '' : 'blur(5px)'">${escapeHtml(walletData.secret_key_hex)}</span>
-                    <button class="btn btn-sm btn-outline-light copy-btn ms-2" onclick="window.copyAddress('${elementId}-hex', this)">Copy</button>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn ms-2" onclick="window.copyAddress('${elementId}-hex', this)">Copy</button>
                 </div>
                 <div class="form-text text-muted small">Click to reveal/hide. 64 characters.</div>
             </div>
@@ -112,7 +167,7 @@ function renderWalletResult(elementId, walletData) {
                 <label class="form-label text-muted small">Secret Key (Base58)</label>
                 <div class="secret-key d-flex justify-content-between align-items-start">
                     <span id="${elementId}-b58" class="secret-text" style="filter: blur(5px); cursor: pointer;" onclick="this.style.filter = this.style.filter ? '' : 'blur(5px)'">${escapeHtml(walletData.secret_key_base58)}</span>
-                    <button class="btn btn-sm btn-outline-light copy-btn ms-2" onclick="window.copyAddress('${elementId}-b58', this)">Copy</button>
+                    <button class="btn btn-sm btn-outline-secondary copy-btn ms-2" onclick="window.copyAddress('${elementId}-b58', this)">Copy</button>
                 </div>
                 <div class="form-text text-muted small">Click to reveal/hide. 52 characters.</div>
             </div>
@@ -240,12 +295,21 @@ async function handleValidate() {
 
 // Initialize
 document.addEventListener('DOMContentLoaded', async () => {
+    // Initialize theme first (before WASM to avoid flash)
+    initTheme();
+
     await initWasm();
 
     // Attach event handlers
     document.getElementById('generate-btn').addEventListener('click', handleGenerate);
     document.getElementById('import-btn').addEventListener('click', handleImport);
     document.getElementById('validate-btn').addEventListener('click', handleValidate);
+
+    // Theme toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
+    }
 
     // Handle enter key in input fields
     document.getElementById('import-secret').addEventListener('keypress', (e) => {
